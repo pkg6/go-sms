@@ -127,6 +127,17 @@ func (maps MapStrings) Values() []string {
 	return values
 }
 
+// Verify 验证出参数
+func (maps MapStrings) Verify(mustKey []string) MapStrings {
+	errs := MapStrings{}
+	for _, key := range mustKey {
+		if _, found := maps[key]; !found {
+			errs.Set(key, key+" parameter is missing")
+		}
+	}
+	return errs
+}
+
 // Implode values 转字符串
 func (maps MapStrings) Implode(sep string) string {
 	if len(maps) <= 0 {
@@ -226,6 +237,17 @@ func (maps MapStringAny) Get(k string, dv any) any {
 		return vv
 	}
 	return dv
+}
+
+// Verify 验证出参数
+func (maps MapStringAny) Verify(mustKey []string) MapStrings {
+	errMaps := MapStrings{}
+	for _, key := range mustKey {
+		if _, found := maps[key]; !found {
+			errMaps.Set(key, key+" parameter is missing")
+		}
+	}
+	return errMaps
 }
 
 // ToIMessage 获取value 要设置默认值

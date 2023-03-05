@@ -37,12 +37,15 @@ func (c Client) Clone() *Client {
 	return &c
 }
 
+// Get get请求
 func (c *Client) Get(assign any, query MapStrings, headers MapStrings) error {
 	host := c.uriQueryMaps(c.Url, c.Query, query).String()
 	allHeaders := MergeMapsString(c.Headers, headers)
 	_, err := c.Request(http.MethodGet, host, nil, allHeaders, assign)
 	return err
 }
+
+// PostForm 表单提交
 func (c *Client) PostForm(assign any, params url.Values, headers MapStrings) error {
 	host := c.uriQueryMaps(c.Url, c.Query).String()
 	allHeaders := MergeMapsString(c.Headers, headers)
@@ -51,8 +54,8 @@ func (c *Client) PostForm(assign any, params url.Values, headers MapStrings) err
 	return err
 }
 
-// PostJson params MapStrings｜MapStringAny｜jsonString
-func (c *Client) PostJson(assign any, body any, headers MapStrings) error {
+// PostJson json提交
+func (c *Client) PostJson(assign any, jsonBody any, headers MapStrings) error {
 	host := c.uriQueryMaps(c.Url, c.Query).String()
 	allHeaders := MergeMapsString(c.Headers, headers)
 	allHeaders.SetForce("Content-Type", JsonContentType, false)
@@ -60,19 +63,15 @@ func (c *Client) PostJson(assign any, body any, headers MapStrings) error {
 	var err error
 	var verify bool
 	//json字符串
-	if str, ok := body.(string); ok {
+	if str, ok := jsonBody.(string); ok {
 		jsonStr = str
 		verify = true
-	}
-	// 转json字符串
-	if maps, ok := body.(MapStrings); ok {
-		jsonStr, err = maps.ToJson()
-		verify = true
-	}
-	// 转json字符串
-	if maps, ok := body.(MapStringAny); ok {
-		jsonStr, err = maps.ToJson()
-		verify = true
+	} else {
+		jsonByte, err := json.Marshal(jsonBody)
+		if err == nil {
+			jsonStr = string(jsonByte)
+			verify = true
+		}
 	}
 	if verify {
 		_, err = c.Request(http.MethodPost, host, strings.NewReader(jsonStr), allHeaders, assign)
