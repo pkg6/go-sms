@@ -2,7 +2,6 @@ package gosms
 
 import (
 	"encoding/json"
-	"errors"
 	"io"
 	"io/ioutil"
 	"log"
@@ -77,12 +76,17 @@ func (c *Client) PostJson(assign any, jsonBody any, headers MapStrings) error {
 		_, err = c.Request(http.MethodPost, host, strings.NewReader(jsonStr), allHeaders, assign)
 		return err
 	}
-	return errors.New("body must be string or MapStrings or MapStringAny")
+	return err
 }
 
 // Request 任意发送请求
 func (c *Client) Request(method, url string, body io.Reader, headers MapStrings, assign any) (*http.Response, error) {
 	client := &http.Client{Timeout: time.Duration(c.Timeout) * time.Second}
+	if c.Debug {
+		log.Printf("Request %s %s", method, url)
+		log.Printf("Response headers: %s", headers)
+		log.Printf("Response body: %s", body)
+	}
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {
 		log.Printf("%s: %s http.NewRequest error=%v", method, url, err)
@@ -101,15 +105,12 @@ func (c *Client) Request(method, url string, body io.Reader, headers MapStrings,
 	}(c.Response.Body)
 	c.BodyByte, _ = ioutil.ReadAll(c.Response.Body)
 	if assign != nil {
-		if err = json.Unmarshal(c.BodyByte, assign); err != nil {
-			if c.Debug {
-				log.Printf("Response json.Unmarshal error=%v", err)
-			}
-		}
+		_ = json.Unmarshal(c.BodyByte, assign)
 	}
 	if c.Debug {
-		// GET 200 http://github.com/pkg6/go-sms headers body
-		log.Printf("Response %s %s %s headers: %s body: %s", c.Response.Status, method, url, c.Response.Header, string(c.BodyByte))
+		log.Printf("Response %s %s %s", c.Response.Status, method, url)
+		log.Printf("Response headers: %s", c.Response.Header)
+		log.Printf("Response body: %s", string(c.BodyByte))
 	}
 	return c.Response, err
 }
