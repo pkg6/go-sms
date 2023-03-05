@@ -1,7 +1,7 @@
 package twilio
 
 import (
-	"encoding/base64"
+	"errors"
 	"fmt"
 	gosms "github.com/pkg6/go-sms"
 	"net/url"
@@ -38,9 +38,12 @@ func (g *Twilio) Send(to gosms.IPhoneNumber, message gosms.IMessage) (gosms.SMSR
 		Url:   fmt.Sprintf("https://api.twilio.com/2010-04-01/Accounts/%s/Messages.json", g.AccountSID),
 		Headers: gosms.MapStrings{
 			"Content-Type":  gosms.FormASCIIContentType,
-			"Authorization": "Basic " + base64.StdEncoding.EncodeToString([]byte(g.AccountSID+":"+g.AuthToken)),
+			"Authorization": "Basic " + gosms.Base64Encode(g.AccountSID+":"+g.AuthToken),
 		},
 	}.Clone().PostForm(&resp, data, nil)
 	result := gosms.BuildSMSResult(to, message, g.Clone(), resp)
+	if resp.Code != 0 {
+		return result, errors.New(resp.Message)
+	}
 	return result, err
 }

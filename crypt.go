@@ -3,6 +3,7 @@ package gosms
 import (
 	"crypto/md5"
 	"crypto/sha1"
+	"encoding/base64"
 	"encoding/hex"
 	"net/url"
 )
@@ -24,4 +25,9 @@ func Sha1String(text string) string {
 // URLEncode urlencode()
 func URLEncode(text string) string {
 	return url.QueryEscape(text)
+}
+
+// Base64Encode  base64
+func Base64Encode(text string) string {
+	return base64.StdEncoding.EncodeToString([]byte(text))
 }
