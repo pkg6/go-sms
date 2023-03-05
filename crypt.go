@@ -3,6 +3,7 @@ package gosms
 import (
 	"crypto/md5"
 	"crypto/sha1"
+	"crypto/sha256"
 	"encoding/base64"
 	"encoding/hex"
 	"net/url"
@@ -18,6 +19,11 @@ func Md5String(text string) string {
 // Sha1String sha1加密
 func Sha1String(text string) string {
 	h := sha1.New()
+	h.Write([]byte(text))
+	return hex.EncodeToString(h.Sum(nil))
+}
+func Sha256String(text string) string {
+	h := sha256.New()
 	h.Write([]byte(text))
 	return hex.EncodeToString(h.Sum(nil))
 }
