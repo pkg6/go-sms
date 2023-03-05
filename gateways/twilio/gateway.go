@@ -33,14 +33,13 @@ func (g *Twilio) Send(to gosms.IPhoneNumber, message gosms.IMessage) (gosms.SMSR
 	data.Set("Body", message.GetContent(g.Clone()))
 	data.Set("From", g.TwilioPhoneNumber)
 	data.Set("To", to.GetUniversalNumber())
-	err := gosms.Client{
+	c := gosms.Client{
 		Debug: true,
 		Url:   fmt.Sprintf("https://api.twilio.com/2010-04-01/Accounts/%s/Messages.json", g.AccountSID),
-		Headers: gosms.MapStrings{
-			"Content-Type":  gosms.FormASCIIContentType,
-			"Authorization": "Basic " + gosms.Base64Encode(g.AccountSID+":"+g.AuthToken),
-		},
-	}.Clone().PostForm(&resp, data, nil)
+	}.Clone()
+	c.SetContentType(gosms.FormASCIIContentType)
+	c.SetBasicAuth(g.AccountSID, g.AuthToken)
+	err := c.PostForm(&resp, data, nil)
 	result := gosms.BuildSMSResult(to, message, g.Clone(), resp)
 	if resp.Code != 0 {
 		return result, errors.New(resp.Message)

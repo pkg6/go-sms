@@ -1,6 +1,7 @@
 package gosms
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"io"
 	"io/ioutil"
@@ -20,13 +21,19 @@ var (
 )
 
 type Client struct {
-	Url      string         `json:"url"`
-	Query    MapStrings     `json:"query"`
-	Headers  MapStrings     `json:"headers"`
-	Debug    bool           `json:"debug"`
-	Timeout  int            `json:"timeout"`
+	Debug bool `json:"debug"`
+	//url
+	Url string `json:"url"`
+	//url query
+	Query MapStrings `json:"query"`
+	// request herader
+	Header MapStrings `json:"headers"`
+	// request timeout
+	Timeout int `json:"timeout"`
+	//response
 	Response *http.Response `json:"response"`
-	BodyByte []byte         `json:"body_byte"`
+	//response body
+	BodyByte []byte `json:"body_byte"`
 }
 
 func (c Client) Clone() *Client {
@@ -36,28 +43,55 @@ func (c Client) Clone() *Client {
 	return &c
 }
 
+func (c *Client) SetUrl(url string) {
+	c.Url = url
+}
+
+func (c *Client) SetQuery(query MapStrings) {
+	c.Query = query
+}
+
+// GetFullUrl 参数进行拼接
+func (c *Client) GetFullUrl(maps ...MapStrings) *url.URL {
+	parse, _ := url.Parse(c.Url)
+	q := parse.Query()
+	for _, m := range maps {
+		for k, v := range m {
+			q.Set(k, v)
+		}
+	}
+	parse.RawQuery = q.Encode()
+	return parse
+}
+
+func (c *Client) SetBasicAuth(username, password string) {
+	auth := username + ":" + password
+	c.Header.Set("Authorization", "Basic "+base64.StdEncoding.EncodeToString([]byte(auth)))
+}
+
+func (c *Client) SetContentType(contentType string) {
+	c.Header.SetForce("Content-Type", contentType, false)
+}
+
 // Get get请求
-func (c *Client) Get(assign any, query MapStrings, headers MapStrings) error {
-	host := c.uriQueryMaps(c.Url, c.Query, query).String()
-	allHeaders := MergeMapsString(c.Headers, headers)
-	_, err := c.Request(http.MethodGet, host, nil, allHeaders, assign)
+func (c *Client) Get(assign any, query MapStrings, header MapStrings) error {
+	host := c.GetFullUrl(c.Query, query).String()
+	_, err := c.Request(http.MethodGet, host, nil, header, assign)
 	return err
 }
 
 // PostForm 表单提交
-func (c *Client) PostForm(assign any, params url.Values, headers MapStrings) error {
-	host := c.uriQueryMaps(c.Url, c.Query).String()
-	allHeaders := MergeMapsString(c.Headers, headers)
-	allHeaders.SetForce("Content-Type", FormContentType, false)
-	_, err := c.Request(http.MethodPost, host, strings.NewReader(params.Encode()), allHeaders, assign)
+func (c *Client) PostForm(assign any, params url.Values, header MapStrings) error {
+	host := c.GetFullUrl(c.Query).String()
+	c.SetContentType(FormContentType)
+	_, err := c.Request(http.MethodPost, host, strings.NewReader(params.Encode()), header, assign)
 	return err
 }
 
 // PostJson json提交
-func (c *Client) PostJson(assign any, jsonBody any, headers MapStrings) error {
-	host := c.uriQueryMaps(c.Url, c.Query).String()
-	allHeaders := MergeMapsString(c.Headers, headers)
-	allHeaders.SetForce("Content-Type", JsonContentType, false)
+func (c *Client) PostJson(assign any, jsonBody any, header MapStrings) error {
+	host := c.GetFullUrl(c.Query).String()
+	c.SetContentType(JsonContentType)
 	var jsonStr string
 	var err error
 	var verify bool
@@ -73,31 +107,34 @@ func (c *Client) PostJson(assign any, jsonBody any, headers MapStrings) error {
 		}
 	}
 	if verify {
-		_, err = c.Request(http.MethodPost, host, strings.NewReader(jsonStr), allHeaders, assign)
+		_, err = c.Request(http.MethodPost, host, strings.NewReader(jsonStr), header, assign)
 		return err
 	}
 	return err
 }
 
 // Request 任意发送请求
-func (c *Client) Request(method, url string, body io.Reader, headers MapStrings, assign any) (*http.Response, error) {
-	client := &http.Client{Timeout: time.Duration(c.Timeout) * time.Second}
+func (c *Client) Request(method, fullUrl string, body io.Reader, header MapStrings, assign any) (*http.Response, error) {
+	client := &http.Client{
+		Timeout: time.Duration(c.Timeout) * time.Second,
+	}
 	if c.Debug {
-		log.Printf("Request %s %s", method, url)
-		log.Printf("Response headers: %s", headers)
+		log.Printf("Request %s %s", method, fullUrl)
+		log.Printf("Response headers: %s", header)
 		log.Printf("Response body: %s", body)
 	}
-	req, err := http.NewRequest(method, url, body)
+	req, err := http.NewRequest(method, fullUrl, body)
 	if err != nil {
-		log.Printf("%s: %s http.NewRequest error=%v", method, url, err)
+		log.Printf("%s: %s http.NewRequest error=%v", method, fullUrl, err)
 		return c.Response, err
 	}
+	headers := MergeMapsString(c.Header, header)
 	for headerKey, headerVal := range headers {
 		req.Header.Set(headerKey, headerVal)
 	}
 	c.Response, err = client.Do(req)
 	if err != nil {
-		log.Printf("%s: %s client.Do error=%v", method, url, err)
+		log.Printf("%s: %s client.Do error=%v", method, fullUrl, err)
 		return c.Response, err
 	}
 	defer func(Body io.ReadCloser) {
@@ -108,22 +145,9 @@ func (c *Client) Request(method, url string, body io.Reader, headers MapStrings,
 		_ = json.Unmarshal(c.BodyByte, assign)
 	}
 	if c.Debug {
-		log.Printf("Response %s %s %s", c.Response.Status, method, url)
+		log.Printf("Response %s %s %s", c.Response.Status, method, fullUrl)
 		log.Printf("Response headers: %s", c.Response.Header)
 		log.Printf("Response body: %s", string(c.BodyByte))
 	}
 	return c.Response, err
-}
-
-// UriQueryMaps 参数进行拼接
-func (c *Client) uriQueryMaps(uri string, maps ...MapStrings) *url.URL {
-	parse, _ := url.Parse(uri)
-	q := parse.Query()
-	for _, m := range maps {
-		for k, v := range m {
-			q.Set(k, v)
-		}
-	}
-	parse.RawQuery = q.Encode()
-	return parse
 }
