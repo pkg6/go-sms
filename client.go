@@ -132,6 +132,9 @@ func (c *Client) Request(method, fullUrl string, body io.Reader, header MapStrin
 	for headerKey, headerVal := range headers {
 		req.Header.Set(headerKey, headerVal)
 	}
+	if userAgent := req.Header.Get("User-Agent"); userAgent == "" {
+		req.Header.Set("User-Agent", "github.com/pkg6/go-sms")
+	}
 	c.Response, err = client.Do(req)
 	if err != nil {
 		log.Printf("%s: %s client.Do error=%v", method, fullUrl, err)
