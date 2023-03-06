@@ -2,6 +2,13 @@ package gosms
 
 import "reflect"
 
+type ILogger interface {
+	I() ILogger
+	Error(format string, v ...any)
+	Warn(format string, v ...any)
+	Debug(format string, v ...any)
+}
+
 // IPhoneNumber 手机号
 type IPhoneNumber interface {
 	Clone() IPhoneNumber

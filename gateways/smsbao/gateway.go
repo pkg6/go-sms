@@ -41,19 +41,14 @@ func (g *SmsBao) Send(to gosms.IPhoneNumber, message gosms.IMessage) (gosms.SMSR
 		"m": m,
 		"c": c,
 	}
-	Client := gosms.Client{
-		Url:   hostParse.String(),
-		Query: query,
-		Debug: false,
-	}.Clone()
-	err := Client.Get(nil, nil, nil)
-	resp.Code = string(Client.BodyByte)
+	response, err := gosms.NewClient(hostParse.String()).SetQueryParams(query).Get(nil)
+	result := gosms.BuildSMSResult(to, message, g.Clone(), resp)
+	resp.Code = string(response)
 	if msg, ok := ErrorStatuses[resp.Code]; ok {
 		resp.Message = msg
 	} else {
 		resp.Message = "未知错误信息"
 	}
-	result := gosms.BuildSMSResult(to, message, g.Clone(), resp)
 	if resp.Code != "0" {
 		return result, errors.New(resp.Message)
 	}

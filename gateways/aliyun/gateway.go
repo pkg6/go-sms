@@ -4,6 +4,7 @@ import (
 	"crypto/hmac"
 	"crypto/sha1"
 	"encoding/base64"
+	"encoding/json"
 	"errors"
 	gosms "github.com/pkg6/go-sms"
 	"net/url"
@@ -90,10 +91,8 @@ func (g *ALiYun) Send(to gosms.IPhoneNumber, message gosms.IMessage) (gosms.SMSR
 	jsonStr, _ := data.ToJson()
 	query["TemplateParam"] = jsonStr
 	query["Signature"] = g.generateSign(query)
-	err := gosms.Client{
-		//Debug:   true,
-		Url: g.Host,
-	}.Clone().Get(&resp, query, nil)
+	response, err := gosms.NewClient(g.Host).Get(query)
+	_ = json.Unmarshal(response, &resp)
 	result := gosms.BuildSMSResult(to, message, g.Clone(), resp)
 	if resp.Code != "ok" {
 		return result, errors.New(resp.Message)

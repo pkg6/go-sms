@@ -1,6 +1,7 @@
 package yunxin
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	gosms "github.com/pkg6/go-sms"
@@ -53,15 +54,14 @@ func (g YunXin) Send(to gosms.IPhoneNumber, message gosms.IMessage) (gosms.SMSRe
 		"Nonce":   gosms.Md5String(gosms.Uniqid("gosms")),
 		"CurTime": gosms.TimeString(),
 	}
-	headers.Set("CheckSum", gosms.Sha1String(fmt.Sprintf("%v%v%v",
-		g.AppSecret,
-		headers.GetDefault("Nonce", ""),
-		headers.GetDefault("CurTime", "")),
-	))
-	err := gosms.Client{
-		Url:   host,
-		Debug: false,
-	}.Clone().PostForm(&resp, param, headers)
+	headers.Set("CheckSum",
+		gosms.Sha1String(fmt.Sprintf("%v%v%v",
+			g.AppSecret,
+			headers.GetDefault("Nonce", ""),
+			headers.GetDefault("CurTime", "")),
+		))
+	response, err := gosms.NewClient(host).SetHeaders(headers).PostForm(param)
+	_ = json.Unmarshal(response, &resp)
 	result := gosms.BuildSMSResult(to, message, g.Clone(), resp)
 	if msg, ok := ErrorStatuses[strconv.Itoa(resp.Code)]; ok {
 		resp.Message = msg

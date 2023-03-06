@@ -1,6 +1,7 @@
 package ihuyi
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/pkg6/go-sms"
@@ -46,11 +47,11 @@ func (g *IHuYi) Send(to gosms.IPhoneNumber, message gosms.IMessage) (gosms.SMSRe
 	body.Set("mobile", mobile)
 	body.Set("content", content)
 	body.Set("time", time)
-	err := gosms.Client{
-		Url:   "http://106.ihuyi.com/webservice/sms.php",
-		Query: gosms.MapStrings{"method": "Submit", "format": g.Format},
-		Debug: false,
-	}.Clone().PostForm(&resp, body, nil)
+	response, err := gosms.
+		NewClient("http://106.ihuyi.com/webservice/sms.php").
+		SetQueryParams(gosms.MapStrings{"method": "Submit", "format": g.Format}).
+		PostForm(body)
+	_ = json.Unmarshal(response, &resp)
 	result := gosms.BuildSMSResult(to, message, g.Clone(), resp)
 	if resp.Code != 2 {
 		return result, errors.New(resp.Msg)

@@ -1,6 +1,7 @@
 package twilio
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	gosms "github.com/pkg6/go-sms"
@@ -33,13 +34,10 @@ func (g *Twilio) Send(to gosms.IPhoneNumber, message gosms.IMessage) (gosms.SMSR
 	data.Set("Body", message.GetContent(g.Clone()))
 	data.Set("From", g.TwilioPhoneNumber)
 	data.Set("To", to.GetUniversalNumber())
-	c := gosms.Client{
-		Debug: true,
-		Url:   fmt.Sprintf("https://api.twilio.com/2010-04-01/Accounts/%s/Messages.json", g.AccountSID),
-	}.Clone()
-	c.SetContentType(gosms.FormASCIIContentType)
-	c.SetBasicAuth(g.AccountSID, g.AuthToken)
-	err := c.PostForm(&resp, data, nil)
+	response, err := gosms.NewClient(fmt.Sprintf("https://api.twilio.com/2010-04-01/Accounts/%s/Messages.json", g.AccountSID)).
+		SetContentType(gosms.FormASCIIContentType).
+		SetBasicAuth(g.AccountSID, g.AuthToken).PostForm(data)
+	_ = json.Unmarshal(response, &resp)
 	result := gosms.BuildSMSResult(to, message, g.Clone(), resp)
 	if resp.Code != 0 {
 		return result, errors.New(resp.Message)
