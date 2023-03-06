@@ -36,7 +36,7 @@ type Client struct {
 
 func NewClient(baseURL string, fns ...func(client *Client)) *Client {
 	client := Client{}.Clone()
-	client.BaseURL = baseURL
+	client.SetBaseURL(baseURL)
 	if client.httpClient == nil {
 		client.httpClient = http.DefaultClient
 	}
@@ -81,8 +81,11 @@ func (c *Client) SetLog(log ILogger) *Client {
 	c.Log = log
 	return c
 }
+
 func (c *Client) SetQueryParams(params MapStrings) *Client {
-	c.QueryParam = MergeMapsString(c.QueryParam, params)
+	for p, v := range params {
+		c.SetQueryParam(p, v)
+	}
 	return c
 }
 func (c *Client) SetQueryParam(key, value string) *Client {
@@ -100,21 +103,10 @@ func (c *Client) SetBasicAuth(username, password string) *Client {
 	c.SetHeader("Authorization", "Basic "+base64.StdEncoding.EncodeToString([]byte(username+":"+password)))
 	return c
 }
-
-// GetUrl 参数进行拼接
-func (c *Client) GetUrl(maps ...MapStrings) *url.URL {
-	parse, _ := url.Parse(c.BaseURL)
-	q := parse.Query()
-	for _, m := range maps {
-		for k, v := range m {
-			q.Set(k, v)
-		}
+func (c *Client) SetHeaders(params MapStrings) *Client {
+	for p, v := range params {
+		c.SetHeader(p, v)
 	}
-	parse.RawQuery = q.Encode()
-	return parse
-}
-func (c *Client) SetHeaders(headers MapStrings) *Client {
-	c.Header = MergeMapsString(c.Header, headers)
 	return c
 }
 func (c *Client) SetHeader(key, value string) *Client {
@@ -128,6 +120,18 @@ func (c *Client) WithUserAgent(userAgent string) *Client {
 func (c *Client) SetContentType(contentType string) *Client {
 	c.Header.SetForce("Content-Type", contentType, false)
 	return c
+}
+
+func (c *Client) GetUrl(maps ...MapStrings) *url.URL {
+	parse, _ := url.Parse(c.BaseURL)
+	q := parse.Query()
+	for _, m := range maps {
+		for k, v := range m {
+			q.Set(k, v)
+		}
+	}
+	parse.RawQuery = q.Encode()
+	return parse
 }
 
 // Get get请求
