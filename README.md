@@ -134,8 +134,8 @@ sms.Send(18888888888, gosms.MapStringAny{
 ~~~
 // IGateway 网关
 type IGateway interface {
-	// Clone 用于初始化默认值
-	Clone() IGateway
+	// I 用于初始化默认值
+	I() IGateway
 	// GetName 网关名称
 	GetName() string
 	// Send 发送操作

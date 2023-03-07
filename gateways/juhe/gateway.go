@@ -15,10 +15,10 @@ type JuHe struct {
 }
 
 func GateWay(key string) gosms.IGateway {
-	return JuHe{Key: key}.Clone()
+	return JuHe{Key: key}.I()
 }
 
-func (g JuHe) Clone() gosms.IGateway {
+func (g JuHe) I() gosms.IGateway {
 	if g.DType == "" {
 		g.DType = "json"
 	}
@@ -31,8 +31,8 @@ func (g JuHe) GetName() string {
 
 func (g JuHe) Send(to gosms.IPhoneNumber, message gosms.IMessage) (gosms.SMSResult, error) {
 	var resp = Response{}
-	template := message.GetTemplate(g.Clone())
-	data := message.GetData(g.Clone())
+	template := message.GetTemplate(g.I())
+	data := message.GetData(g.I())
 	param := url.Values{}
 	// 接收短信的手机号码
 	param.Set("mobile", gosms.GetPhoneNumber(to))
@@ -45,7 +45,7 @@ func (g JuHe) Send(to gosms.IPhoneNumber, message gosms.IMessage) (gosms.SMSResu
 	param.Set("key", g.Key)
 	response, err := gosms.NewClient("http://v.juhe.cn/sms/send").PostForm(param)
 	_ = json.Unmarshal(response, &resp)
-	result := gosms.BuildSMSResult(to, message, g.Clone(), resp)
+	result := gosms.BuildSMSResult(to, message, g.I(), resp)
 	if err != nil {
 		return result, err
 	}

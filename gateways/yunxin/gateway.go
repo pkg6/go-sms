@@ -16,10 +16,10 @@ type YunXin struct {
 }
 
 func GateWay(appKey, appSecret string) gosms.IGateway {
-	return YunXin{AppKey: appKey, AppSecret: appSecret}.Clone()
+	return YunXin{AppKey: appKey, AppSecret: appSecret}.I()
 }
 
-func (g YunXin) Clone() gosms.IGateway {
+func (g YunXin) I() gosms.IGateway {
 	return &g
 }
 
@@ -29,13 +29,13 @@ func (g YunXin) GetName() string {
 
 func (g YunXin) Send(to gosms.IPhoneNumber, message gosms.IMessage) (gosms.SMSResult, error) {
 	var resp Response
-	data := message.GetData(g.Clone())
+	data := message.GetData(g.I())
 	action := data.GetDefault("action", "sendCode")
 	host := fmt.Sprintf("https://api.netease.im/%s/%s.action", "sms", strings.ToLower(action))
 	param := url.Values{}
 	switch action {
 	case "sendCode":
-		templateId := message.GetTemplate(g.Clone())
+		templateId := message.GetTemplate(g.I())
 		param.Set("mobile", to.GetUniversalNumber())
 		param.Set("authCode", data.GetDefault("code", ""))
 		param.Set("deviceId", data.GetDefault("device_id", ""))
@@ -47,7 +47,7 @@ func (g YunXin) Send(to gosms.IPhoneNumber, message gosms.IMessage) (gosms.SMSRe
 		param.Set("code", data.GetDefault("code", ""))
 	default:
 		err := errors.New(fmt.Sprintf("action:%v not supported", action))
-		return gosms.BuildSMSResult(to, message, g.Clone(), resp), err
+		return gosms.BuildSMSResult(to, message, g.I(), resp), err
 	}
 	headers := gosms.MapStrings{
 		"AppKey":  g.AppKey,
@@ -62,7 +62,7 @@ func (g YunXin) Send(to gosms.IPhoneNumber, message gosms.IMessage) (gosms.SMSRe
 		))
 	response, err := gosms.NewClient(host).SetHeaders(headers).PostForm(param)
 	_ = json.Unmarshal(response, &resp)
-	result := gosms.BuildSMSResult(to, message, g.Clone(), resp)
+	result := gosms.BuildSMSResult(to, message, g.I(), resp)
 	if msg, ok := ErrorStatuses[strconv.Itoa(resp.Code)]; ok {
 		resp.Message = msg
 	} else {

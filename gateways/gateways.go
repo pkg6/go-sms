@@ -21,22 +21,22 @@ type Gateways struct {
 
 func (g Gateways) FormatGateways() (gateways []gosms.IGateway) {
 	if !gosms.IsZero(g.IHuYi) {
-		gateways = append(gateways, g.IHuYi.Clone())
+		gateways = append(gateways, g.IHuYi.I())
 	}
 	if !gosms.IsZero(g.ALiYun) {
-		gateways = append(gateways, g.ALiYun.Clone())
+		gateways = append(gateways, g.ALiYun.I())
 	}
 	if !gosms.IsZero(g.JuHe) {
-		gateways = append(gateways, g.JuHe.Clone())
+		gateways = append(gateways, g.JuHe.I())
 	}
 	if !gosms.IsZero(g.SmsBao) {
-		gateways = append(gateways, g.SmsBao.Clone())
+		gateways = append(gateways, g.SmsBao.I())
 	}
 	if !gosms.IsZero(g.YunXin) {
-		gateways = append(gateways, g.YunXin.Clone())
+		gateways = append(gateways, g.YunXin.I())
 	}
 	if !gosms.IsZero(g.YunXin) {
-		gateways = append(gateways, g.YunXin.Clone())
+		gateways = append(gateways, g.YunXin.I())
 	}
 	return gateways
 }

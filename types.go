@@ -11,7 +11,7 @@ type ILogger interface {
 
 // IPhoneNumber 手机号
 type IPhoneNumber interface {
-	Clone() IPhoneNumber
+	I() IPhoneNumber
 	// GetCode 手机号号码前缀 例：中国 86
 	GetCode() int
 	// GetNumber 手机号 18888888888
@@ -34,8 +34,8 @@ type GatewayMap map[string]IGateway
 
 // IGateway 网关
 type IGateway interface {
-	// Clone 用于初始化默认值
-	Clone() IGateway
+	// I 用于初始化默认值
+	I() IGateway
 	// GetName 网关名称
 	GetName() string
 	// Send 发送操作
@@ -44,7 +44,7 @@ type IGateway interface {
 
 // IMessage 消息内容
 type IMessage interface {
-	Clone() IMessage
+	I() IMessage
 	// GetMessageType 消息类型
 	GetMessageType() int
 	// GetSignName 签名

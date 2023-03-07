@@ -26,7 +26,7 @@ type GoSMS struct {
 func GoSMSInstance(gosms GoSMS) *GoSMS {
 	if SingletonGoSMS == nil {
 		once.Do(func() {
-			SingletonGoSMS = gosms.clone()
+			SingletonGoSMS = gosms.Clone()
 		})
 	}
 	return SingletonGoSMS
@@ -34,7 +34,7 @@ func GoSMSInstance(gosms GoSMS) *GoSMS {
 
 // NewParser  携带解析器实例
 func NewParser(parser IParser) *GoSMS {
-	sms := GoSMS{}.clone()
+	sms := GoSMS{}.Clone()
 	gateways := parser.FormatGateways()
 	for _, gateway := range gateways {
 		sms.Extend(gateway.GetName(), gateway)
@@ -44,14 +44,14 @@ func NewParser(parser IParser) *GoSMS {
 
 // NewGateways 携带网关实例
 func NewGateways(gateways ...IGateway) *GoSMS {
-	sms := GoSMS{}.clone()
+	sms := GoSMS{}.Clone()
 	for _, gateway := range gateways {
 		sms.Extend("", gateway)
 	}
 	return sms
 }
 
-func (sms GoSMS) clone() *GoSMS {
+func (sms GoSMS) Clone() *GoSMS {
 	sms.gateways = GatewayMap{}
 	sms.sendGateways = []IGateway{}
 	sms.SendAsNames = []string{}
@@ -133,7 +133,7 @@ func (sms *GoSMS) formatMessage(message any) IMessage {
 		for _, gateway := range iMessage.GetGateways() {
 			sms.Extend(GatewayName(gateway), gateway)
 		}
-		return iMessage.Clone()
+		return iMessage.I()
 	}
 	if msa, ok := message.(map[string]any); ok {
 		stringAnyMap := MapStringAny{}
@@ -144,7 +144,7 @@ func (sms *GoSMS) formatMessage(message any) IMessage {
 		for _, gateway := range iMessage.GetGateways() {
 			sms.Extend(GatewayName(gateway), gateway)
 		}
-		return iMessage.Clone()
+		return iMessage.I()
 	}
 	panic("GoSMS.FormatMessage must be IMessage or MapStringAny")
 }

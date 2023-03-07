@@ -17,10 +17,10 @@ type Twilio struct {
 }
 
 func GateWay(accountSID, authToken, twilioPhoneNumber string) gosms.IGateway {
-	return Twilio{AccountSID: accountSID, AuthToken: authToken, TwilioPhoneNumber: twilioPhoneNumber}.Clone()
+	return Twilio{AccountSID: accountSID, AuthToken: authToken, TwilioPhoneNumber: twilioPhoneNumber}.I()
 }
 
-func (g Twilio) Clone() gosms.IGateway {
+func (g Twilio) I() gosms.IGateway {
 	return &g
 }
 
@@ -31,14 +31,14 @@ func (g *Twilio) GetName() string {
 func (g *Twilio) Send(to gosms.IPhoneNumber, message gosms.IMessage) (gosms.SMSResult, error) {
 	var resp Response
 	var data = url.Values{}
-	data.Set("Body", message.GetContent(g.Clone()))
+	data.Set("Body", message.GetContent(g.I()))
 	data.Set("From", g.TwilioPhoneNumber)
 	data.Set("To", to.GetUniversalNumber())
 	response, err := gosms.NewClient(fmt.Sprintf("https://api.twilio.com/2010-04-01/Accounts/%s/Messages.json", g.AccountSID)).
 		WithContentType(gosms.FormASCIIContentType).
 		WithBasicAuth(g.AccountSID, g.AuthToken).PostForm(data)
 	_ = json.Unmarshal(response, &resp)
-	result := gosms.BuildSMSResult(to, message, g.Clone(), resp)
+	result := gosms.BuildSMSResult(to, message, g.I(), resp)
 	if resp.Code != 0 {
 		return result, errors.New(resp.Message)
 	}

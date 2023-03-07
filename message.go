@@ -33,7 +33,7 @@ func MessageContent(content string) IMessage {
 func MessageTemplate(template string, data MapStrings) IMessage {
 	return &Message{Template: template, Data: data}
 }
-func (m Message) Clone() IMessage {
+func (m Message) I() IMessage {
 	return &m
 }
 

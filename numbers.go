@@ -18,10 +18,10 @@ func GetPhoneNumber(number IPhoneNumber) string {
 
 // NoCodePhoneNumber 无code手机号
 func NoCodePhoneNumber(number int) IPhoneNumber {
-	return PhoneNumber{Number: number}.Clone()
+	return PhoneNumber{Number: number}.I()
 }
 
 // CHNPhoneNumber 中国手机号
 func CHNPhoneNumber(number int) IPhoneNumber {
-	return PhoneNumber{Number: number, Code: 86}.Clone()
+	return PhoneNumber{Number: number, Code: 86}.I()
 }

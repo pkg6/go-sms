@@ -10,7 +10,7 @@ type PhoneNumber struct {
 	Code   int `json:"code"`
 }
 
-func (p PhoneNumber) Clone() IPhoneNumber {
+func (p PhoneNumber) I() IPhoneNumber {
 	return &p
 }
 

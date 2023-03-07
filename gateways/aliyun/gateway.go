@@ -27,9 +27,9 @@ func GateWay(accessKeyId, accessKeySecret string) gosms.IGateway {
 		AccessKeyId:     accessKeyId,
 		AccessKeySecret: accessKeySecret,
 	}
-	return gateway.Clone()
+	return gateway.I()
 }
-func (g ALiYun) Clone() gosms.IGateway {
+func (g ALiYun) I() gosms.IGateway {
 	if g.Host == "" {
 		g.Host = "http://dysmsapi.aliyuncs.com"
 	}
@@ -79,9 +79,9 @@ func (g *ALiYun) generateSign(query gosms.MapStrings) string {
 
 func (g *ALiYun) Send(to gosms.IPhoneNumber, message gosms.IMessage) (gosms.SMSResult, error) {
 	var resp Response
-	data := message.GetData(g.Clone())
-	signName := data.GetDefault("signName", message.GetSignName(g.Clone()))
-	template := message.GetTemplate(g.Clone())
+	data := message.GetData(g.I())
+	signName := data.GetDefault("signName", message.GetSignName(g.I()))
+	template := message.GetTemplate(g.I())
 	data.Delete("signName")
 	query := g.query()
 	mobile := gosms.GetPhoneNumber(to)
@@ -93,7 +93,7 @@ func (g *ALiYun) Send(to gosms.IPhoneNumber, message gosms.IMessage) (gosms.SMSR
 	query["Signature"] = g.generateSign(query)
 	response, err := gosms.NewClient(g.Host).Get(query)
 	_ = json.Unmarshal(response, &resp)
-	result := gosms.BuildSMSResult(to, message, g.Clone(), resp)
+	result := gosms.BuildSMSResult(to, message, g.I(), resp)
 	if resp.Code != "ok" {
 		return result, errors.New(resp.Message)
 	}

@@ -27,7 +27,7 @@ type ClientResult struct {
 // BuildSMSResult 在网关快速生成结构体
 func BuildSMSResult(phoneNumber IPhoneNumber, message IMessage, gateway IGateway, response any) SMSResult {
 	rt := SMSResult{
-		Gateway:     gateway.Clone(),
+		Gateway:     gateway,
 		Message:     message,
 		PhoneNumber: phoneNumber,
 	}

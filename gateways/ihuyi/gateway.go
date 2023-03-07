@@ -20,9 +20,9 @@ func GateWay(account, password string) gosms.IGateway {
 	return IHuYi{
 		Account:  account,
 		Password: password,
-	}.Clone()
+	}.I()
 }
-func (g IHuYi) Clone() gosms.IGateway {
+func (g IHuYi) I() gosms.IGateway {
 	if g.Format == "" {
 		g.Format = "json"
 	}
@@ -39,7 +39,7 @@ func (g *IHuYi) Send(to gosms.IPhoneNumber, message gosms.IMessage) (gosms.SMSRe
 	resp := Response{}
 	time := gosms.TimeString()
 	body := url.Values{}
-	content := message.GetContent(g.Clone())
+	content := message.GetContent(g.I())
 	mobile := gosms.GetPhoneNumber(to)
 	account := g.Account
 	body.Set("account", account)
@@ -52,7 +52,7 @@ func (g *IHuYi) Send(to gosms.IPhoneNumber, message gosms.IMessage) (gosms.SMSRe
 		SetQueryParams(gosms.MapStrings{"method": "Submit", "format": g.Format}).
 		PostForm(body)
 	_ = json.Unmarshal(response, &resp)
-	result := gosms.BuildSMSResult(to, message, g.Clone(), resp)
+	result := gosms.BuildSMSResult(to, message, g.I(), resp)
 	if resp.Code != 2 {
 		return result, errors.New(resp.Msg)
 	}

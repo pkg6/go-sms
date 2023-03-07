@@ -15,9 +15,9 @@ type SmsBao struct {
 }
 
 func GateWay(user, password string) gosms.IGateway {
-	return SmsBao{User: user, Password: password}.Clone()
+	return SmsBao{User: user, Password: password}.I()
 }
-func (g SmsBao) Clone() gosms.IGateway {
+func (g SmsBao) I() gosms.IGateway {
 	return &g
 }
 func (g *SmsBao) GetName() string {
@@ -26,7 +26,7 @@ func (g *SmsBao) GetName() string {
 func (g *SmsBao) Send(to gosms.IPhoneNumber, message gosms.IMessage) (gosms.SMSResult, error) {
 	var resp Response
 	var m string
-	c := message.GetContent(g.Clone())
+	c := message.GetContent(g.I())
 	hostParse, _ := url.Parse("http://api.smsbao.com")
 	if to.GetCode() == 0 || to.GetCode() == 86 {
 		m = strconv.Itoa(to.GetNumber())
@@ -42,7 +42,7 @@ func (g *SmsBao) Send(to gosms.IPhoneNumber, message gosms.IMessage) (gosms.SMSR
 		"c": c,
 	}
 	response, err := gosms.NewClient(hostParse.String()).SetQueryParams(query).Get(nil)
-	result := gosms.BuildSMSResult(to, message, g.Clone(), resp)
+	result := gosms.BuildSMSResult(to, message, g.I(), resp)
 	resp.Code = string(response)
 	if msg, ok := ErrorStatuses[resp.Code]; ok {
 		resp.Message = msg

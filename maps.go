@@ -263,7 +263,7 @@ func (maps MapStringAny) ToIMessage() IMessage {
 	if gateways, ok := maps.Get("gateways", nil).([]IGateway); ok {
 		message.Gateways = gateways
 	}
-	return message.Clone()
+	return message.I()
 }
 
 // Set 设置
