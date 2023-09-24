@@ -1,6 +1,7 @@
 package smsbao
 
 import (
+	"context"
 	"errors"
 	"github.com/pkg6/go-sms"
 	"net/url"
@@ -44,7 +45,7 @@ func (g *SmsBao) Send(to gosms.IPhoneNumber, message gosms.IMessage) (gosms.SMSR
 	q.Set("p", gosms.Md5String(g.Password))
 	q.Set("m", m)
 	q.Set("c", c)
-	response, err := requests.Get(host, q)
+	response, err := gosms.Client.Get(context.Background(), host, q)
 	result := gosms.BuildSMSResult(to, message, g.I(), resp)
 	resp.Code = response.ReadAllString()
 	defer response.Close()

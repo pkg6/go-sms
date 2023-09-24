@@ -1,9 +1,9 @@
 package yunxin
 
 import (
+	"context"
 	"errors"
 	"fmt"
-	"github.com/pkg6/go-requests"
 	"github.com/pkg6/go-sms"
 	"net/url"
 	"strconv"
@@ -63,9 +63,10 @@ func (g YunXin) Send(to gosms.IPhoneNumber, message gosms.IMessage) (gosms.SMSRe
 		headers.GetDefault("Nonce", ""),
 		headers.GetDefault("CurTime", "")),
 	)
-	response, err := requests.PostForm(host, param, func(client *requests.Client) {
-		client.WithHeader("CheckSum", checkSum)
-	})
+	client := gosms.Client
+	client.WithHeader("CheckSum", checkSum)
+
+	response, err := client.PostForm(context.Background(), host, param)
 	err = response.Unmarshal(&resp)
 	result := gosms.BuildSMSResult(to, message, g.I(), resp)
 	if err != nil {

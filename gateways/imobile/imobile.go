@@ -1,9 +1,9 @@
 package imobile
 
 import (
+	"context"
 	"errors"
 	"fmt"
-	"github.com/pkg6/go-requests"
 	"github.com/pkg6/go-sms"
 	"net/url"
 	"strconv"
@@ -63,7 +63,7 @@ func (g Imobile) Send(to gosms.IPhoneNumber, message gosms.IMessage) (gosms.SMSR
 	req.PhoneNos = strconv.Itoa(to.GetNumber())
 	req.Content = message.GetContent(g.I())
 	req.AccessKey = g.buildAccessKey(req.PhoneNos, strconv.Itoa(req.Random), strconv.Itoa(req.Timestamp))
-	response, err := requests.PostJson(g.url().String(), req)
+	response, err := gosms.Client.PostJson(context.Background(), g.url().String(), req)
 	_ = response.Unmarshal(&resp)
 	result := gosms.BuildSMSResult(to, message, g.I(), resp)
 	if err != nil {
