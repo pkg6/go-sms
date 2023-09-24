@@ -1,11 +1,11 @@
 package aliyun
 
 import (
+	"context"
 	"crypto/hmac"
 	"crypto/sha1"
 	"encoding/base64"
 	"errors"
-	"github.com/pkg6/go-requests"
 	"github.com/pkg6/go-sms"
 	"net/url"
 	"strings"
@@ -95,7 +95,7 @@ func (g *ALiYun) Send(to gosms.IPhoneNumber, message gosms.IMessage) (gosms.SMSR
 	jsonStr, _ := data.ToJson()
 	query["TemplateParam"] = jsonStr
 	query["Signature"] = g.generateSign(query)
-	response, err := requests.Get(g.Host, query)
+	response, err := gosms.Client.Get(context.Background(), g.Host, query)
 	defer response.Close()
 	err = response.Unmarshal(&resp)
 	result := gosms.BuildSMSResult(to, message, g, resp)

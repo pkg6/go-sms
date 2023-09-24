@@ -1,8 +1,8 @@
 package juhe
 
 import (
+	"context"
 	"errors"
-	"github.com/pkg6/go-requests"
 	"github.com/pkg6/go-sms"
 	"net/url"
 )
@@ -47,7 +47,7 @@ func (g JuHe) Send(to gosms.IPhoneNumber, message gosms.IMessage) (gosms.SMSResu
 	param.Set("vars", vars)
 	// 接口请求Key
 	param.Set("key", g.Key)
-	response, err := requests.PostForm("http://v.juhe.cn/sms/send", param)
+	response, err := gosms.Client.PostForm(context.Background(), "http://v.juhe.cn/sms/send", param)
 	defer response.Close()
 	err = response.Unmarshal(&resp)
 	result := gosms.BuildSMSResult(to, message, g, resp)

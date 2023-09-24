@@ -1,9 +1,9 @@
 package twilio
 
 import (
+	"context"
 	"errors"
 	"fmt"
-	"github.com/pkg6/go-requests"
 	"github.com/pkg6/go-sms"
 	"net/url"
 )
@@ -39,9 +39,9 @@ func (g *Twilio) Send(to gosms.IPhoneNumber, message gosms.IMessage) (gosms.SMSR
 	data.Set("From", g.TwilioPhoneNumber)
 	data.Set("To", to.GetUniversalNumber())
 	uri := fmt.Sprintf("https://api.twilio.com/2010-04-01/Accounts/%s/Messages.json", g.AccountSID)
-	response, err := requests.PostForm(uri, data, func(client *requests.Client) {
-		client.WithBasicAuth(g.AccountSID, g.AuthToken)
-	})
+	client := gosms.Client
+	client.WithBasicAuth(g.AccountSID, g.AuthToken)
+	response, err := client.PostForm(context.Background(), uri, data)
 	defer response.Close()
 	err = response.Unmarshal(&resp)
 	result := gosms.BuildSMSResult(to, message, g, resp)

@@ -1,6 +1,7 @@
 package ihuyi
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"github.com/pkg6/go-requests"
@@ -57,7 +58,7 @@ func (g *IHuYi) Send(to gosms.IPhoneNumber, message gosms.IMessage) (gosms.SMSRe
 	body.Set("mobile", mobile)
 	body.Set("content", content)
 	body.Set("time", time)
-	response, err := requests.PostForm(g.url().String(), body)
+	response, err := gosms.Client.PostForm(context.Background(), g.url().String(), body)
 	defer response.Close()
 	err = response.Unmarshal(&resp)
 	result := gosms.BuildSMSResult(to, message, g, resp)
