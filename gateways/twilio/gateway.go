@@ -43,7 +43,7 @@ func (g *Twilio) Send(to gosms.IPhoneNumber, message gosms.IMessage) (gosms.SMSR
 	client.WithBasicAuth(g.AccountSID, g.AuthToken)
 	response, err := client.PostForm(context.Background(), uri, data)
 	defer response.Close()
-	err = response.Unmarshal(&resp)
+	_ = response.Unmarshal(&resp)
 	result := gosms.BuildSMSResult(to, message, g, resp)
 	if err != nil {
 		return result, err

@@ -93,5 +93,10 @@ func imobileSend() {
 	fmt.Println(err)
 }
 func main() {
+	ihuyiSend()
+	smsbaosend()
+	juhesend()
 	imobileSend()
+	yunXinsend()
+	twiliosend()
 }
