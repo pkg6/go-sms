@@ -1,0 +1,10 @@
+github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
+github.com/pkg6/go-requests v0.0.15 h1:nXVflyRA7R6V6yvr65bFL7ImuQylySUddN7BfeBOR3w=
+github.com/pkg6/go-requests v0.0.15/go.mod h1:/rcVm8Itd2djtxDVxjRnHURChV86TB4ooZnP+IBZBmg=
+github.com/pkg6/go-requests v0.0.16-0.20231005060919-03c71f4e4625 h1:B0KsARsJ8nFlws5aezp9E0Oc/qfSLuFfWWkSFMQl0Jo=
+github.com/pkg6/go-requests v0.0.16-0.20231005060919-03c71f4e4625/go.mod h1:/rcVm8Itd2djtxDVxjRnHURChV86TB4ooZnP+IBZBmg=
+github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
+github.com/stretchr/testify v1.8.1 h1:w7B6lhMri9wdJUVmEZPGGhZzrYTPvgJArz7wNPgYKsk=
+golang.org/x/net v0.14.0 h1:BONx9s002vGdD9umnlX1Po8vOZmrgH34qlHcD1MfK14=
+golang.org/x/net v0.14.0/go.mod h1:PpSgVXXLK0OxS0F31C1/tv6XNguvCrnXIDrFMspZIUI=
+gopkg.in/yaml.v3 v3.0.1 h1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=
