@@ -40,7 +40,7 @@ func (g *IHuYi) url() *url.URL {
 	v := url.Values{}
 	v.Set("method", "Submit")
 	v.Set("format", g.Format)
-	return requests.Uri("http://106.ihuyi.com/webservice/sms.php", v)
+	return requests.URIQuery("http://106.ihuyi.com/webservice/sms.php", v)
 }
 
 // Send 发送短信方法
