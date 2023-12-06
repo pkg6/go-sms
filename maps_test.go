@@ -563,14 +563,18 @@ func TestMergeMapsString(t *testing.T) {
 func TestReplaceMapStrings(t *testing.T) {
 	type args struct {
 		s    string
-		news MapStrings
+		news map[string]string
 	}
 	tests := []struct {
 		name string
 		args args
 		want string
 	}{
-		// TODO: Add test cases.
+		{
+			name: "手机号",
+			args: args{s: "您手机注册的验证码为：【变量1】，如有问题请拨打客服电话：【变量2】", news: map[string]string{"变量1": "111", "变量2": "222"}},
+			want: "您手机注册的验证码为：【111】，如有问题请拨打客服电话：【222】",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -592,7 +596,15 @@ func TestReplaceMapStringsForStringIndex(t *testing.T) {
 		args args
 		want string
 	}{
-		// TODO: Add test cases.
+		{
+			name: "phone",
+			args: args{
+				s:    "您手机注册的验证码为：【变量】，如有问题请拨打客服电话：【变量】",
+				old:  "变量",
+				news: MapStrings{"0": "111", "1": "222"},
+			},
+			want: "您手机注册的验证码为：【111】，如有问题请拨打客服电话：【222】",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

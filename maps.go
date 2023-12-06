@@ -34,9 +34,9 @@ func MergeMapsString(maps ...MapStrings) MapStrings {
 }
 
 // ReplaceMapStringsForStringIndex
-// 您手机注册的验证码为：【变量】，如有问题请拨打客服电话：【变量】
-// new = MapStrings{"0"："111"，"1"::"222"}
-// 您手机注册的验证码为：111，如有问题请拨打客服电话：222
+// 您手机注册的验证码为："您手机注册的验证码为：【变量】，如有问题请拨打客服电话：【变量】"
+// new = MapStrings{"0": "111", "1": "222"}
+// 您手机注册的验证码为：【111】，如有问题请拨打客服电话：【222】
 func ReplaceMapStringsForStringIndex(s, old string, news MapStrings) string {
 	var e []string
 	if len(news) <= 0 {
@@ -50,7 +50,7 @@ func ReplaceMapStringsForStringIndex(s, old string, news MapStrings) string {
 			}
 		} else {
 			if len(v) > 0 {
-				e = append(e, fmt.Sprintf("%v%v", v, old))
+				e = append(e, fmt.Sprintf("%v", v))
 			}
 		}
 	}
@@ -60,18 +60,12 @@ func ReplaceMapStringsForStringIndex(s, old string, news MapStrings) string {
 // ReplaceMapStrings 您手机注册的验证码为：【变量1】，如有问题请拨打客服电话：【变量2】
 // new = MapStrings{"变量1"："111"，"变量2"::"222"}
 // 您手机注册的验证码为：111，如有问题请拨打客服电话：222
-func ReplaceMapStrings(s string, news MapStrings) string {
-	fn := func(keys, values []string) []string {
-		sort.Strings(keys)
-		r := make([]string, 2*len(keys))
-		for i, e := range keys {
-			fmt.Println(e)
-			r[i*2] = e
-			r[i*2+1] = values[i]
-		}
-		return r
+func ReplaceMapStrings(s string, repl MapStrings) string {
+	var r []string
+	for k, v := range repl {
+		r = append(r, k, v)
 	}
-	return strings.NewReplacer(fn(news.Keys(), news.Values())...).Replace(s)
+	return strings.NewReplacer(r...).Replace(s)
 }
 
 // Set 添加值 force=true 覆盖原值
