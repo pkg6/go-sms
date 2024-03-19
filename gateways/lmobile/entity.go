@@ -1,4 +1,4 @@
-package imobile
+package lmobile
 
 type request struct {
 	AccountId string `json:"AccountId"`
