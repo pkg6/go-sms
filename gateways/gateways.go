@@ -4,8 +4,8 @@ import (
 	gosms "github.com/pkg6/go-sms"
 	"github.com/pkg6/go-sms/gateways/aliyun"
 	"github.com/pkg6/go-sms/gateways/ihuyi"
-	"github.com/pkg6/go-sms/gateways/imobile"
 	"github.com/pkg6/go-sms/gateways/juhe"
+	"github.com/pkg6/go-sms/gateways/lmobile"
 	"github.com/pkg6/go-sms/gateways/smsbao"
 	"github.com/pkg6/go-sms/gateways/twilio"
 	"github.com/pkg6/go-sms/gateways/yunxin"
@@ -18,7 +18,7 @@ type Gateways struct {
 	SmsBao  smsbao.SmsBao   `json:"smsbao"`
 	YunXin  yunxin.YunXin   `json:"yunxin"`
 	Twilio  twilio.Twilio   `json:"twilio"`
-	Imobile imobile.Imobile `json:"imobile"`
+	Imobile lmobile.Imobile `json:"lmobile"`
 }
 
 func (g Gateways) FormatGateways() (gateways []gosms.IGateway) {
