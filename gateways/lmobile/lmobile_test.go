@@ -1,4 +1,4 @@
-package imobile
+package lmobile
 
 import (
 	gosms "github.com/pkg6/go-sms"
