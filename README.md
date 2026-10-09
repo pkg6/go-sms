@@ -2,13 +2,6 @@
 
 <p align="center">:calling: 一款满足你的多种发送需求的短信发送组件</p>
 
-
-[![Go Report Card](https://goreportcard.com/badge/github.com/pkg6/go-sms)](https://goreportcard.com/report/github.com/pkg6/go-sms)
-[![Go.Dev reference](https://img.shields.io/badge/go.dev-reference-blue?logo=go&logoColor=white)](https://pkg.go.dev/github.com/pkg6/go-sms?tab=doc)
-[![Sourcegraph](https://sourcegraph.com/github.com/pkg6/go-sms/-/badge.svg)](https://sourcegraph.com/github.com/pkg6/go-sms?badge)
-[![Release](https://img.shields.io/github/release/pkg6/go-sms.svg?style=flat-square)](https://github.com/pkg6/go-sms/releases)
-
-
 ## 特点
 
 1. 支持目前市面多家服务商
